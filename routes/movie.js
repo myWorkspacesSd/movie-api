@@ -19,14 +19,26 @@ router.post('/', (req, res, next) => {
 });
 
 //get all movies
-router.get('/', (req, res, next) => {
-  const promise = Movie.find({});
+router.get('/', (req, res) => {
+	const promise = Movie.aggregate([
+		{
+			$lookup: {
+				from: 'directors',
+				localField: 'directorId',
+				foreignField: '_id',
+				as: 'director'
+			}
+		},
+		{
+			$unwind: '$director'
+		}
+	]);
 
-  promise.then((movies)=>{
-    res.json(movies);
-  }).catch((err)=>{
-    res.json(err);
-  });
+	promise.then((data) => {
+		res.json(data);
+	}).catch((err) => {
+		res.json(err);
+	})
 });
 
 //get top 10 movies
