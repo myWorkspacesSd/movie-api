@@ -8,6 +8,12 @@ const indexRouter = require('./routes/index');
 const movieRouter = require('./routes/movie');
 const directorRouter = require('./routes/director');
 
+//Config
+const config = require('./config');
+
+//Middleware
+const verifyToken = require('./middleware/verify-token');
+
 const app = express();
 
 // db connection
@@ -16,6 +22,7 @@ const db = require('./helper/db.js')();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
+app.set('api_secret_key', config.api_secret_key);
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -24,6 +31,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
+app.use('/api', verifyToken);
 app.use('/api/movies', movieRouter);
 app.use('/api/directors', directorRouter);
 
